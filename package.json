@@ -1,0 +1,60 @@
+{
+  "name": "dsh-theme-cyrene",
+  "version": "0.37.0",
+  "type": "module",
+  "description": "「昔涟印象」主题包：为 DeepSeek Harness Web 界面提供月白 / 潮汐 / 夜阑三套配色、可选的开屏动画、侧栏品牌位、对话线稿水印和热切换面板。",
+  "license": "MIT",
+  "author": "Cyrene Impressions contributors",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "theme",
+    "plugin",
+    "bundle",
+    "cyrene"
+  ],
+  "engines": {
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "splash-art.svg",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md",
+    "docs/INSTALL.md",
+    "docs/screenshots/banner.jpg",
+    "docs/screenshots/interface.png"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-theme",
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Linxi-1105/dsh-theme-cyrene.git"
+  },
+  "homepage": "https://github.com/Linxi-1105/dsh-theme-cyrene#readme",
+  "bugs": {
+    "url": "https://github.com/Linxi-1105/dsh-theme-cyrene/issues"
+  }
+}
