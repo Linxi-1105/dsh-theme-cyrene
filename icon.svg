@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cyrene theme">
+  <defs>
+    <linearGradient id="petal" x1="12" y1="8" x2="52" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD9EC" />
+      <stop offset="0.55" stop-color="#F2A6D4" />
+      <stop offset="1" stop-color="#B98BE8" />
+    </linearGradient>
+    <radialGradient id="core" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#FFFDFE" />
+      <stop offset="0.6" stop-color="#F6D7EC" />
+      <stop offset="1" stop-color="#C79BEF" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#1B1326" />
+  <g opacity="0.95">
+    <path d="M32 8c6 8 6 14 0 20-6-6-6-12 0-20Z" fill="url(#petal)" />
+    <path d="M56 32c-8 6-14 6-20 0 6-6 12-6 20 0Z" fill="url(#petal)" />
+    <path d="M32 56c-6-8-6-14 0-20 6 6 6 12 0 20Z" fill="url(#petal)" />
+    <path d="M8 32c8-6 14-6 20 0-6 6-12 6-20 0Z" fill="url(#petal)" />
+  </g>
+  <circle cx="32" cy="32" r="7.5" fill="url(#core)" />
+  <circle cx="32" cy="32" r="11.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1" />
+</svg>
