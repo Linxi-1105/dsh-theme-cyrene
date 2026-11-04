@@ -1,0 +1,14 @@
+# Mounts the Cyrene theme bundle, then frees the sidebar brand slots for it.
+#
+# `sidebar.brand.mark` and `sidebar.brand.name` are `single` slots: exactly one
+# occupant renders. The shipped official brand package occupies both, so this
+# pack switches that row off and fills the slots itself. With the theme turned
+# off, the fill renders the same fish mark and wordmark the official row
+# renders, so Ctrl+Alt+X still restores a stock-looking sidebar.
+- insert:
+    - id: theme-cyrene
+      name: 'dsh-theme-cyrene'
+
+- id: ui-brand-official
+  name: '@deepseek-ai/dsh-client-ui-brand-official'
+  disabled: true
