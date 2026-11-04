@@ -1,0 +1,67 @@
+NOTICE
+======
+
+本包是非官方同人作品，与 miHoYo / HoYoverse、DeepSeek 均无隶属、合作或背书关系。
+
+法律声明
+--------
+
+© 米哈游版权所有
+
+《崩坏：星穹铁道》素材的权利归米哈游所有，其他内容的相关权利、利益均归各自所有者享有。
+
+本包包含两类不同授权的材料。
+
+一、代码与原创图形
+------------------
+
+`index.js`、`client.js`、`cordis.patch.yml`、`locale/*.json`、`docs/*` 以及
+`icon.svg`（四瓣花核图标）由本项目贡献者编写，采用 MIT License，全文见 LICENSE。
+
+二、角色同人美术
+----------------
+
+以下资源包含或描绘《崩坏：星穹铁道》角色「昔涟 / Cyrene」：
+
+- `splash-art.svg`（开屏立绘）
+- `client.js` 中内嵌的：
+  - `SPLASH_ART`（开屏立绘）
+  - `HERO_MARK`（新对话页标题装饰）
+  - `CHAT_ART_LIGHT` / `CHAT_ART_DARK`（对话区线稿水印）
+  - `SIGN_MARKUP`（「Cyrene」手写签名）
+
+这些是**非官方同人作品**，不属于 MIT License 的授权范围。本项目不对角色形象
+主张任何权利；「昔涟 / Cyrene」「崩坏：星穹铁道 / Honkai: Star Rail」及相关名称、
+角色、世界观的权利归 miHoYo / HoYoverse 所有。
+
+这些资源随本主题包一起提供，仅供**非商业的同人使用**。本项目不对角色形象
+授予任何超出适用法律与权利人政策的许可；请勿单独售卖、用于商业宣传，或
+暗示 miHoYo / HoYoverse 或 DeepSeek 对本项目有任何背书。如果你所在地区对
+同人素材的使用有不同规定，请以当地法律和权利人的官方政策为准。
+
+如果权利方认为其中某项资源不适合公开分发，请通过仓库 issue 联系；维护者会
+在确认后尽快移除对应文件，或提供不含该资源的替代版本。
+
+三、其他
+--------
+
+DeepSeek Harness 的名称与商标归其权利人所有。本项目与 DeepSeek、miHoYo /
+HoYoverse 均无隶属、合作或背书关系。
+
+---
+
+English summary
+---------------
+
+The source code and the original four-petal icon are licensed under the MIT
+License (see LICENSE).
+
+The character artwork listed above is unofficial fan art depicting Cyrene from
+Honkai: Star Rail. It is **not** covered by the MIT License, and no license to
+the character is granted by this project. All rights in the character and
+related intellectual property belong to miHoYo / HoYoverse. The art is included
+for non-commercial fan use only; do not sell it, use it in commercial
+promotion, or imply endorsement by miHoYo / HoYoverse or DeepSeek.
+
+This project is not affiliated with, endorsed by, or sponsored by DeepSeek or
+miHoYo / HoYoverse.
