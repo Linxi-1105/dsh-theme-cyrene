@@ -1802,7 +1802,13 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
     /* ------------------------------------------------------------------ */
 
     let lockedByUrl = false
-    let state = loadState()
+    // `state` is filled in further down, once the shortcut tables are declared:
+    // `loadState()` runs `sanitize()`, which normalises the stored shortcut and
+    // therefore reads `MOD_ORDER`/`MOD_ALIASES`/`KEY_TOKEN`. Calling it here hit
+    // their TDZ, and the try/catch inside `loadState` swallowed the ReferenceError
+    // and returned the defaults — so every stored preference was silently
+    // discarded on load whenever the record carried a `shortcut` key.
+    let state = { ...DEFAULT_STATE }
     let mounted = false
     let disposeFns = []
     let panel = null
@@ -1831,6 +1837,9 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
       shift: 'shift',
       meta: 'meta', cmd: 'meta', command: 'meta', win: 'meta', super: 'meta',
     }
+    // The only key tokens `comboFromEvent` can ever produce. Anything outside
+    // this set could be stored and persisted, but would never fire.
+    const KEY_TOKEN = /^(?:[a-z0-9]|f\d{1,2}|space|escape|enter|tab|backspace|delete|insert|plus|home|end|pageup|pagedown|arrow(?:up|down|left|right))$/
     const KEY_LABELS = {
       space: 'Space', escape: 'Esc', enter: 'Enter', tab: 'Tab',
       backspace: 'Backspace', delete: 'Delete', insert: 'Insert', plus: '+',
@@ -1877,7 +1886,10 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
         const piece = part.trim()
         if (!piece) continue
         if (MOD_ALIASES[piece]) mods.add(MOD_ALIASES[piece])
-        else token = piece
+        else if (KEY_TOKEN.test(piece)) token = piece
+        // Anything else can never match a KeyboardEvent `key`, so reject the
+        // whole combination instead of storing a shortcut that never fires.
+        else return ''
       }
       if (!token) return ''
       return [...MOD_ORDER.filter((mod) => mods.has(mod)), token].join('+')
@@ -1938,6 +1950,9 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
       if (!Number.isFinite(n)) return DEFAULT_STATE.chatBgY
       return Math.min(360, Math.max(0, Math.round(n / 4) * 4))
     }
+
+    // Safe here: every table `sanitize()` can reach is now initialised.
+    state = loadState()
 
     function sanitize(raw) {
       const next = { ...DEFAULT_STATE }
@@ -2025,8 +2040,8 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
       }
     }
 
-    function persist() {
-      if (lockedByUrl) return
+    function persist(force) {
+      if (lockedByUrl && !force) return
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
       } catch { /* storage may be unavailable */ }
@@ -2292,6 +2307,9 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
       splashState = 'done'
       clearSplashTimer()
       clearSplashWait()
+      // Must happen before the early return below: when the panel stops the
+      // splash first the host is already gone, and the observer would leak.
+      stopSplashLangWatch()
       if (splashKeyHandler) {
         try { document.removeEventListener('keydown', splashKeyHandler, true) } catch { /* ignore */ }
         splashKeyHandler = null
@@ -2536,6 +2554,25 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
     // host re-renders this line once a second, so anything periodic here strobes.
     let phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)]
 
+    // The transcript is the user's own text (and the assistant's), so the copy
+    // pass must never touch it: a message that happens to contain one of our
+    // strings came back altered in the DOM, in copies and in search. The
+    // reasoning row lives inside the same container but is the one line there
+    // we do own, so it stays exempt.
+    const CONVERSATION_SCOPE = '[data-conversation-content]'
+    const COPY_KEEP = '[data-chat-running]'
+
+    function insideConversation(node) {
+      const el = node.nodeType === 1 ? node : node.parentElement
+      if (!el || typeof el.closest !== 'function') return false
+      try {
+        if (el.closest(COPY_KEEP)) return false
+        return el.closest(CONVERSATION_SCOPE) !== null
+      } catch {
+        return false
+      }
+    }
+
     function rewrite(text, forward) {
       let out = text
       for (const [from, to] of COPY) {
@@ -2600,6 +2637,7 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
 
     function rewriteNode(node, forward) {
       if (!node) return
+      if (insideConversation(node)) return
       if (node.nodeType === 1) {
         const parent = node.parentNode
         if (parent && COPY_SKIP.has(parent.nodeName)) return
@@ -3021,7 +3059,7 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
           </div>
           <div class="actions">
             <button data-role="wind">重播特效</button>
-            <button data-role="copy">复制诊断</button>
+            <button data-role="copy-diag">复制诊断</button>
             <button data-role="panic" class="danger">紧急恢复</button>
           </div>
           <p class="hint">
@@ -3094,7 +3132,7 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
         if (state.splash) api.splashPlay()
       })
 
-      card.querySelector('[data-role="copy"]').addEventListener('click', async () => {
+      card.querySelector('[data-role="copy-diag"]').addEventListener('click', async () => {
         const report = JSON.stringify({ ...snapshot(), tokens: readTokens() }, null, 2)
         try {
           await navigator.clipboard.writeText(report)
@@ -3312,9 +3350,12 @@ body[data-ds-dark-theme] #cy-theme-splash .cy-splash-ripple {
         return snapshot()
       },
       panic() {
-        try { localStorage.removeItem(STORAGE_KEY) } catch { /* ignore */ }
+        // Emergency off has to outlive the tab: writing the closed state back
+        // is what makes it stick, so a reload does not quietly switch the pack
+        // on again. `force` because the URL lock is what the user is fleeing.
         state = { ...DEFAULT_STATE, enabled: false, ambient: false, chatBg: false, chatBgAnchor: 'center' }
         render()
+        persist(true)
         return snapshot()
       },
       /** 重播标题上的那次风：切页面会自动播，这里是手动再来一遍。 */
